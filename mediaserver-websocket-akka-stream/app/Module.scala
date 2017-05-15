@@ -1,5 +1,6 @@
 import com.google.inject.AbstractModule
 import domains.chat.ChatRoomRepository
+import domains.video.VideoRoomRepository
 
 /**
  * This class is a Guice module that tells Guice how to bind several
@@ -15,6 +16,7 @@ class Module extends AbstractModule {
 
   override def configure() = {
     bind(classOf[ChatRoomRepository]).to(classOf[infrastructure.chat.ChatRoomClient])
+    bind(classOf[VideoRoomRepository]).to(classOf[infrastructure.video.VideoRoomClient])
   }
 
 }
