@@ -1,6 +1,6 @@
 import { browser, element, by } from 'protractor';
 
-export class AngularWebcmAppPage {
+export class AngularWebsocketChatPage {
   navigateTo() {
     return browser.get('/');
   }

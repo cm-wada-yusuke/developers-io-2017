@@ -1,0 +1,6 @@
+<h2>Lobby</h2>
+<div>
+  <label>Room number: </label><input #roomNumber />
+  <label>Your name: </label><input #name />
+  <button (click)="join(roomNumber.value, name.value);">Join</button>
+</div>

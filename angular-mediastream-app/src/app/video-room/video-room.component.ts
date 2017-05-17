@@ -6,12 +6,11 @@ declare const MediaRecorder: any;
 declare const MediaSource: any;
 
 @Component({
-  selector: 'app-imaging-room',
-  templateUrl: './imaging-room.component.html',
-  styleUrls: ['./imaging-room.component.css']
+  selector: 'app-video-room',
+  templateUrl: './video-room.component.html',
+  styleUrls: ['./video-room.component.css']
 })
-
-export class ImagingRoomComponent implements OnInit {
+export class VideoRoomComponent implements OnInit {
 
   private localStream;
   private recorder;

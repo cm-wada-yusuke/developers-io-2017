@@ -1,0 +1,39 @@
+html, body {
+  height: 100%;
+}
+
+.container {
+  height:calc(100% - 60px);
+  position: relative;
+}
+
+.chat-box {
+  height: calc(100% - 120px);
+  overflow-y: scroll;
+  position: relative;
+  border: solid 1px #acacac;
+  margin-top: 5 px;
+}
+
+.me {
+  background-color: aliceblue;
+}
+
+.face img {
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 4px #ddd;
+}
+
+.fukidashi {
+  display: inline-block;
+  padding: 15px 20px;
+  background-color: transparent;
+}
+
+.send-box {
+  background-color: #ddd;
+  padding: 20px;
+  vertical-align: middle;
+  border: solid 1px #acacac;
+}
