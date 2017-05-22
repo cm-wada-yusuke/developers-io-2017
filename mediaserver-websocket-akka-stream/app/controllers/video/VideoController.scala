@@ -1,5 +1,6 @@
 package controllers.video
 
+import java.nio.ByteBuffer
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
@@ -18,15 +19,15 @@ class VideoController @Inject()(
     streamVideoService: VideoService
 ) {
 
-  def start(roomId: String) = WebSocket.accept[ByteString, ByteString] { request =>
+  def start(roomId: String) = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
 
 
     // TODO: ユーザ名がない場合はユーザ一覧を返すAPIとなるのでここは後で分岐する必要がある
     val userName = request.queryString("user_name").headOption.getOrElse("anon")
 
-    val userInput: Flow[ByteString, VideoMessage, _] = ActorFlow.actorRef[ByteString, VideoMessage](out => VideoRequestActor.props(out, userName))
+    val userInput: Flow[Array[Byte], VideoMessage, _] = ActorFlow.actorRef[Array[Byte], VideoMessage](out => VideoRequestActor.props(out, userName))
     val room = streamVideoService.start(roomId, userName)
-    val userOutPut: Flow[VideoMessage, ByteString, _] = ActorFlow.actorRef[VideoMessage, ByteString](out => VideoResponseActor.props(out,userName))
+    val userOutPut: Flow[VideoMessage, Array[Byte], _] = ActorFlow.actorRef[VideoMessage, Array[Byte]](out => VideoResponseActor.props(out,userName))
 
     userInput.viaMat(room.bus)(Keep.right).viaMat(userOutPut)(Keep.right)
   }

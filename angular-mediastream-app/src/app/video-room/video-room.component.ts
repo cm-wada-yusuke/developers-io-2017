@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Observavle} from 'Rx';
 import {Observable} from 'rxjs/Observable';
+import {VideoService} from './video.service';
+import {Subject} from 'rxjs/Subject';
 
 declare const MediaRecorder: any;
 declare const MediaSource: any;
@@ -8,29 +10,37 @@ declare const MediaSource: any;
 @Component({
   selector: 'app-video-room',
   templateUrl: './video-room.component.html',
+  providers: [VideoService],
   styleUrls: ['./video-room.component.css']
 })
+
 export class VideoRoomComponent implements OnInit {
+
+
+  private subject: Subject<ArrayBuffer>;
 
   private localStream;
   private recorder;
-  // private remoteChunks: ArrayBuffer = new ArrayBuffer(1024);
-  // private remoteSource = Observable.create((observer) =>
-  //
-  // )
-  // private remoteVideoSource;
   private remoteBuffer;
+  private internetBuffer;
   @ViewChild('localVideoPlayer') localVideoPlayer: any;
   @ViewChild('remoteVideoPlayer') remoteVideoPlayer: any;
+  @ViewChild('internetVideoPlayer') internetVideoPlayer: any;
 
   private mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
   private mediaSource = new MediaSource();
+  private internetSource = new MediaSource();
 
-  constructor() {
+
+  constructor(private service: VideoService) {
   }
 
   ngOnInit() {
   }
+
+  private sendChunk(chunk: ArrayBuffer): void {
+    this.service.send(chunk);
+}
 
   startVideo(): void {
 
@@ -50,6 +60,28 @@ export class VideoRoomComponent implements OnInit {
   }
 
   publishVideo(): void {
+    // インターネット接続
+    // const internetReader = new FileReader();
+    // internetReader.addEventListener('loadend', () => {
+    //   this.internetBuffer.appendBuffer(internetReader.result);
+    // });
+
+    this.subject = this.service.connect('1', 'wada');
+
+    this.internetVideoPlayer.nativeElement.src = URL.createObjectURL(this.internetSource);
+    this.internetSource.addEventListener('sourceopen', () => {
+      const internetBuffer = this.internetSource.addSourceBuffer('video/webm; codecs=vp9');
+      internetBuffer.addEventListener('updateend', () => {
+        this.internetVideoPlayer.nativeElement.play();
+      });
+      this.internetBuffer = internetBuffer;
+      this.subject.subscribe(chunk => {
+        this.internetBuffer.appendBuffer(chunk);
+        console.log('internet' + chunk);
+      });
+    });
+
+
 
     // リモート再生
     const reader = new FileReader();
@@ -57,7 +89,7 @@ export class VideoRoomComponent implements OnInit {
       // reader.result contains the contents of blob as a typed array
       // appendする
       this.remoteBuffer.appendBuffer(reader.result);
-      console.log(reader.result);
+      console.log('remote: ' + reader.result.data);
     });
 
 
@@ -84,18 +116,9 @@ export class VideoRoomComponent implements OnInit {
     this.recorder = new MediaRecorder(this.localStream, options);
 
     this.recorder.ondataavailable = (event) => {
-      console.log('data available: evt.data.type=' + event.data.type + ' size=' + event.data.size);
-      // this.remoteChunks = event.data;
-      // TODO 送信処理
-
-
-      // イベントデータからBLOE => ArrayBuffer とし専有しているFileReaderで読み込む
-      // const chunks = []
-      // chunks.push(event.data);
-      // const blob = new Blob(chunks, {type: 'application/octet-binary'});
-      reader.readAsArrayBuffer(event.data);
-      // this.remoteBuffer.appendBuffer(event.data);
-      // console.log(chunks);
+      // console.log('data available: evt.data.type=' + event.data.type + ' size=' + event.data.size);
+      reader.readAsArrayBuffer(event.data); // byte[]
+      this.sendChunk(event.data);
     }
 
     this.recorder.onstop = (event) => {

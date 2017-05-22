@@ -6,7 +6,7 @@ sealed trait VideoMessage
 
 case class Video(
     sender: String,
-    data: ByteString
+    data: Array[Byte]
 ) extends  VideoMessage
 
 case class Leave(sender: String) extends VideoMessage

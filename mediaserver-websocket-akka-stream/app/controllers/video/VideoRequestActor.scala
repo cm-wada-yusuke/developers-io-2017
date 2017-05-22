@@ -8,7 +8,7 @@ import domains.video.{ Leave, Video }
 class VideoRequestActor(out: ActorRef, userName: String) extends Actor {
 
   override def receive: Receive = {
-    case msg: ByteString =>
+    case msg: Array[Byte] =>
       println(msg)
       out ! Video(userName, msg)
   }

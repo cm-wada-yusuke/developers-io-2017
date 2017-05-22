@@ -13,6 +13,8 @@ import {AppRoutingModule} from './routing/app-rouitng.module';
 import { LobbyComponent } from './lobby/lobby.component';
 import {AppNgAutoScrollDirective} from '../lib/ng-auto-scroll';
 import { VideoRoomComponent } from './video-room/video-room.component';
+import {ArrayBufferWebSocketService} from './arraybuffer-websocket.service';
+import {VideoService} from './video-room/video.service';
 
 ///<reference path="./Bar.ts"/>
 
@@ -33,7 +35,9 @@ import { VideoRoomComponent } from './video-room/video-room.component';
   ],
   providers: [
     WebSocketService,
-    ChatService
+    ChatService,
+    ArrayBufferWebSocketService,
+    VideoService
   ],
   bootstrap: [AppComponent]
 })
