@@ -1,12 +1,10 @@
 package controllers.video
 
-import java.nio.ByteBuffer
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.{ Flow, Keep }
-import akka.util.ByteString
 import domains.video.VideoMessage
 import play.api.libs.streams.ActorFlow
 import play.api.mvc.WebSocket
@@ -22,7 +20,6 @@ class VideoController @Inject()(
   def start(roomId: String) = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
 
 
-    // TODO: ユーザ名がない場合はユーザ一覧を返すAPIとなるのでここは後で分岐する必要がある
     val userName = request.queryString("user_name").headOption.getOrElse("anon")
 
     val userInput: Flow[Array[Byte], VideoMessage, _] = ActorFlow.actorRef[Array[Byte], VideoMessage](out => VideoRequestActor.props(out, userName))

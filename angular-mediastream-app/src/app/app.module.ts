@@ -15,6 +15,7 @@ import {AppNgAutoScrollDirective} from '../lib/ng-auto-scroll';
 import { VideoRoomComponent } from './video-room/video-room.component';
 import {ArrayBufferWebSocketService} from './arraybuffer-websocket.service';
 import {VideoService} from './video-room/video.service';
+import { MembersVideoRoomComponent } from './members-video-room/members-video-room.component';
 
 ///<reference path="./Bar.ts"/>
 
@@ -24,7 +25,8 @@ import {VideoService} from './video-room/video.service';
     ChatComponent,
     LobbyComponent,
     AppNgAutoScrollDirective,
-    VideoRoomComponent
+    VideoRoomComponent,
+    MembersVideoRoomComponent
   ],
   imports: [
     BrowserModule,

@@ -1,5 +1,6 @@
 import com.google.inject.AbstractModule
 import domains.chat.ChatRoomRepository
+import domains.member.MemberRepository
 import domains.video.VideoRoomRepository
 
 /**
@@ -17,6 +18,7 @@ class Module extends AbstractModule {
   override def configure() = {
     bind(classOf[ChatRoomRepository]).to(classOf[infrastructure.chat.ChatRoomClient])
     bind(classOf[VideoRoomRepository]).to(classOf[infrastructure.video.VideoRoomClient])
+    bind(classOf[MemberRepository]).to(classOf[infrastructure.member.MemberClient])
   }
 
 }

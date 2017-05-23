@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Observavle} from 'Rx';
-import {Observable} from 'rxjs/Observable';
 import {VideoService} from './video.service';
 import {Subject} from 'rxjs/Subject';
 

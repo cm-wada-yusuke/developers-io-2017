@@ -1,0 +1,20 @@
+<div class="container">
+  <button (click)="start();">publish</button>
+  <button (click)="stop();">stop</button>
+
+  <ul class="list-group">
+    <li class="list-group-item">
+      <div class="col-xs-12">
+        <video autoplay #localVideoPlayer
+               style="width: 240px; height: 180px; border: 1px solid black; transform: scale(-1, 1);"></video>
+      </div>
+    </li>
+  </ul>
+  <div class="row container">
+    <div *ngFor="let member of members | async" class="col-sm-3">
+      <video autoplay #{{member}}Player
+             style="width: 240px; height: 180px; border: 1px solid black; transform: scale(-1, 1);"></video>
+      <!--<div class="col-xs-12 "><video autoplay style="width: 240px; height: 180px; border: 1px solid black; transform: scale(-1, 1);"></video></div>-->
+    </div>
+  </div>
+</div>
