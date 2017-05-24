@@ -9,7 +9,7 @@ export class MemberService {
   private messages: Subject<Members>;
 
   private chatUrl(roomNumber: string, name: string): string {
-    return `ws://localhost:9000/members/stream/${roomNumber}?user_name=${name}`;
+    return `wss://192.168.11.2:9443/members/stream/${roomNumber}?user_name=${name}`;
   }
 
   constructor(private ws: WebSocketService) {

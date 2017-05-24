@@ -20,12 +20,12 @@ class VideoRoomClient @Inject()(
   import VideoRoomClient._
 
   override def videoRoom(roomId: String, userName: String): VideoRoom = synchronized {
-    roomPool.get.get(roomId) match {
+    roomPool.get.get(roomId + userName) match {
       case Some(videoRoom) =>
         videoRoom
       case None =>
         val room = create(roomId, userName)
-        roomPool.get() += (roomId -> room)
+        roomPool.get() += (roomId + userName -> room)
         room
     }
   }

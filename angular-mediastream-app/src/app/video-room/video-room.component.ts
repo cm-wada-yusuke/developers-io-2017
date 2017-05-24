@@ -107,7 +107,7 @@ export class VideoRoomComponent implements OnInit {
 
     const options = {
       audioBitsPerSecond: 64000,
-      videoBitsPerSecond: 512000,
+      videoBitsPerSecond: 64000,
       mimeType: 'video/webm; codecs=vp9'
     };
 
@@ -125,7 +125,7 @@ export class VideoRoomComponent implements OnInit {
       this.recorder = null;
     };
 
-    this.recorder.start(1000 / 30);
+    this.recorder.start(1000);
     console.log('publish');
   }
 

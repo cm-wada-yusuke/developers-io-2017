@@ -1,12 +1,11 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Observavle} from 'Rx';
 import {VideoService} from './video.service';
-import {Subject} from 'rxjs/Subject';
-import {Members} from './Members';
 import {MemberService} from './member.service';
 import {ActivatedRoute, Params} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 
+declare const MediaRecorder: any;
 declare const MediaSource: any;
 
 @Component({
@@ -26,13 +25,6 @@ export class MembersVideoRoomComponent implements OnInit {
   @ViewChild('localVideoPlayer') localVideoPlayer: any;
 
 
-  // private internetBuffer;
-  // @ViewChild('internetVideoPlayer') internetVideoPlayer: any;
-  // private internetSource = new MediaSource();
-
-
-  // for html
-  // @Input() members: string[] = new Array();
   members: Observable<string[]>;
 
 
@@ -68,12 +60,41 @@ export class MembersVideoRoomComponent implements OnInit {
     this.members = this.memberService.connect(this.roomNumber, this.name)
       .debounceTime(1000)
       .distinctUntilChanged()
-      .concatMap( members => Observable.of<string[]>(members.members) )
+      .concatMap(members => Observable.of<string[]>(members.members))
 
   }
 
-  private sendChunk(chunk: ArrayBuffer): void {
-    this.videoService.send(chunk);
+
+  start(): void {
+
+    const subject = this.videoService.connect(this.roomNumber, this.name);
+
+    const options = {
+      audioBitsPerSecond: 64000,
+      videoBitsPerSecond: 64000,
+      mimeType: 'video/webm; codecs=vp9'
+    };
+
+    this.recorder = new MediaRecorder(this.localStream, options);
+
+    this.recorder.ondataavailable = (event) => {
+      subject.next(event.data);
+    };
+
+    this.recorder.onstop = (event) => {
+      console.log('recorder.stop(), so playback');
+      this.recorder = null;
+    };
+
+    this.recorder.start(500);
+    console.log('publish');
+  }
+
+  stop(): void {
+    if (this.recorder) {
+      this.recorder.stop();
+      console.log('stop');
+    }
   }
 
 }
