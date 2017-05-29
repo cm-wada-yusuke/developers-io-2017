@@ -1,5 +1,9 @@
 <h2>Lobby</h2>
 <div>
+  <div>まずはこちらにアクセスしていただき、HTTPSでの接続を許可してください。</div>
+  <div><a href="{{serverAddress}}">{{serverAddress}}</a></div>
+  <input type="radio" [(ngModel)]="roomType" name="roomType" value="video">Video
+  <input type="radio" [(ngModel)]="roomType" name="roomType" value="chat">Chat
   <label>Room number: </label><input #roomNumber />
   <label>Your name: </label><input #name />
   <button (click)="join(roomNumber.value, name.value);">Join</button>

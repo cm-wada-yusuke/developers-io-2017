@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-lobby',
@@ -8,6 +9,9 @@ import {Router} from '@angular/router';
 })
 export class LobbyComponent implements OnInit {
 
+  roomType: string;
+  serverAddress = `https://${environment.mediaServerHost}:9443/`
+
   constructor(
     private router: Router
   ) {
@@ -15,14 +19,15 @@ export class LobbyComponent implements OnInit {
 
   join(roomNumber: string, name: string): void {
     this.router.navigate([
-      './rooms',
-      roomNumber
+        './' + this.roomType,
+        roomNumber
       ],
       {queryParams: {name: name}}
     );
   }
 
   ngOnInit() {
+    this.roomType = 'video';
   }
 
 }

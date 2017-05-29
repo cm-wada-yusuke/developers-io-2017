@@ -7,9 +7,9 @@ import {MembersVideoRoomComponent} from '../members-video-room/members-video-roo
 
 
 const routes: Routes = [
-  {path: '', redirectTo: '/rooms', pathMatch: 'full'},
-  {path: 'rooms', component: LobbyComponent},
-  {path: 'rooms/:roomNumber', component: ChatComponent},
+  {path: '', redirectTo: '/lobby', pathMatch: 'full'},
+  {path: 'lobby', component: LobbyComponent},
+  {path: 'chat/:roomNumber', component: ChatComponent},
   {path: 'localVideo/:roomNumber', component: VideoRoomComponent},
   {path: 'video/:roomNumber', component: MembersVideoRoomComponent}
 ];
