@@ -60,18 +60,21 @@ export class MembersVideoRoomComponent implements OnInit {
     this.members = this.memberService.connect(this.roomNumber, this.name)
       .debounceTime(1000)
       .distinctUntilChanged()
-      .concatMap(members => Observable.of<string[]>(members.members))
+      .concatMap(members => {
+        this.restart();
+        return Observable.of<string[]>(members.members)
+      });
 
   }
 
 
   start(): void {
 
-    const subject = this.videoService.connect(this.roomNumber, this.name);
+    let subject = this.videoService.connect(this.roomNumber, this.name);
 
     const options = {
       audioBitsPerSecond: 64000,
-      videoBitsPerSecond: 64000,
+      videoBitsPerSecond: 100000,
       mimeType: 'video/webm; codecs=vp9'
     };
 
@@ -83,6 +86,8 @@ export class MembersVideoRoomComponent implements OnInit {
 
     this.recorder.onstop = (event) => {
       console.log('recorder.stop(), so playback');
+      subject.complete();
+      subject = null;
       this.recorder = null;
     };
 
@@ -95,6 +100,17 @@ export class MembersVideoRoomComponent implements OnInit {
       this.recorder.stop();
       console.log('stop');
     }
+  }
+
+  restart(): void {
+
+    if (!this.recorder) {
+      return;
+    }
+
+    this.stop();
+    this.start();
+
   }
 
 }

@@ -1,8 +1,7 @@
 package controllers.video
 
 import akka.actor.{ Actor, ActorRef, PoisonPill, Props }
-import akka.util.ByteString
-import domains.video.{ Leave, Video }
+import domains.video.{ Join, Leave, Video }
 
 
 class VideoRequestActor(out: ActorRef, userName: String) extends Actor {
@@ -10,6 +9,11 @@ class VideoRequestActor(out: ActorRef, userName: String) extends Actor {
   override def receive: Receive = {
     case msg: Array[Byte] =>
       out ! Video(userName, msg)
+  }
+
+
+  override def preStart(): Unit = {
+    out ! Join(userName)
   }
 
   override def postStop(): Unit = {

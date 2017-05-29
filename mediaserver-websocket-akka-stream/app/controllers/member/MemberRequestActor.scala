@@ -11,7 +11,6 @@ class MemberRequestActor(out: ActorRef, roomId: String, userName: String) extend
   }
 
   override def preStart(): Unit = {
-    println(s"prestart: $userName")
     out ! Join(userName)
   }
 

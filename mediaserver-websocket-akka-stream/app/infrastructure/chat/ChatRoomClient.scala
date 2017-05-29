@@ -49,7 +49,7 @@ class ChatRoomClient @Inject()(
         .joinMat(KillSwitches.singleBidi[ChatMessage, ChatMessage])(Keep.right)
         .backpressureTimeout(3.seconds)
         .map { e =>
-          println(s"$e $channel")
+//          println(s"$e $channel")
           e
         }
 

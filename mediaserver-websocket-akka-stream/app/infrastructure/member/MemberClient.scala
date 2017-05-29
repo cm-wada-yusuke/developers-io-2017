@@ -43,12 +43,12 @@ class MemberClient @Inject()(
                   val newMember = List(name)
                   val members = Members(ms.members ::: newMember)
                   memberPool.get() += (roomId -> members)
-                  println(s"join ${newMember}, members: ${members}")
+//                  println(s"join ${newMember}, members: ${members}")
                   members
                 case None =>
                   val members = Members(List(name))
                   memberPool.get() += (roomId -> members)
-                  println(s"join ${members}, members: ${members}")
+//                  println(s"join ${members}, members: ${members}")
                   members
               }
             case Leave(name) =>
@@ -57,7 +57,7 @@ class MemberClient @Inject()(
                   val filteredMember = ms.members.filterNot(_ == name)
                   val members = Members(filteredMember)
                   memberPool.get() += (roomId -> members)
-                  println(s"leave ${filteredMember}, members: ${members}")
+//                  println(s"leave ${filteredMember}, members: ${members}")
                   members
                 case None =>
                   Members(List())

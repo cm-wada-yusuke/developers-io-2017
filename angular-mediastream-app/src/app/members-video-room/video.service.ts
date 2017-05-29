@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {ArrayBufferWebSocketService} from '../arraybuffer-websocket.service';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class VideoService {
 
   private url(roomNumber: string, name: string): string {
-    return `wss://192.168.11.2:9443/video/stream/${roomNumber}?user_name=${name}`;
+    return `wss://${environment.mediaServerHost}:9443/video/stream/${roomNumber}?user_name=${name}`;
   }
 
   constructor(private ws: ArrayBufferWebSocketService) {

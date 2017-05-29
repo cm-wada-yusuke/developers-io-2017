@@ -59,16 +59,16 @@ object LoggingActorFlow {
 
         def receive = {
           case Status.Success(ss) =>
-            println("LoggingActorFlow: Finished", ss)
+//            println("LoggingActorFlow: Finished", ss)
             flowActor ! PoisonPill
           case Status.Failure(fs) =>
-            println("LoggingActorFlow: Finished", fs)
+            println("LoggingActorFlow: Failure", fs)
             flowActor ! PoisonPill
           case Terminated(a) =>
             println("LoggingActorFlow: Terminated", a)
             context.stop(self)
           case other =>
-            println("LoggingActorFlow: Other", other)
+//            println("LoggingActorFlow: Other", other)
             flowActor ! other
         }
 

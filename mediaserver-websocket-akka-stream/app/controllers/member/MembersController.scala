@@ -19,7 +19,6 @@ class MembersController @Inject()(
 
   def members(roomId: String) = WebSocket.accept[JsValue, JsValue] { request =>
     val userName = request.queryString("user_name").headOption.getOrElse("anon")
-    println(userName)
 
     val userInput: Flow[JsValue, MemberMessage, _] = ActorFlow.actorRef[JsValue, MemberMessage](out => MemberRequestActor.props(out, roomId, userName))
     val members = memberService.members(roomId, userName)
