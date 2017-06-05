@@ -23,8 +23,4 @@ export class VideoService {
       });
   }
 
-  // send(chunk: ArrayBuffer): void {
-  //   this.subject.next(chunk);
-  // }
-
 }

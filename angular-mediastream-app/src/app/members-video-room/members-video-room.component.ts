@@ -6,7 +6,6 @@ import {ActivatedRoute, Params} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 
 declare const MediaRecorder: any;
-declare const MediaSource: any;
 
 @Component({
   selector: 'app-members-video-room',

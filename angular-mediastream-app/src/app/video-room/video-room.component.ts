@@ -26,7 +26,6 @@ export class VideoRoomComponent implements OnInit {
   @ViewChild('remoteVideoPlayer') remoteVideoPlayer: any;
   @ViewChild('internetVideoPlayer') internetVideoPlayer: any;
 
-  private mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
   private mediaSource = new MediaSource();
   private internetSource = new MediaSource();
 
@@ -59,12 +58,6 @@ export class VideoRoomComponent implements OnInit {
   }
 
   publishVideo(): void {
-    // インターネット接続
-    // const internetReader = new FileReader();
-    // internetReader.addEventListener('loadend', () => {
-    //   this.internetBuffer.appendBuffer(internetReader.result);
-    // });
-
     this.subject = this.service.connect('1', 'wada');
 
     this.internetVideoPlayer.nativeElement.src = URL.createObjectURL(this.internetSource);
@@ -81,25 +74,19 @@ export class VideoRoomComponent implements OnInit {
     });
 
 
-
     // リモート再生
     const reader = new FileReader();
     reader.addEventListener('loadend', () => {
-      // reader.result contains the contents of blob as a typed array
-      // appendする
       this.remoteBuffer.appendBuffer(reader.result);
       console.log('remote: ' + reader.result.data);
     });
 
-
     this.remoteVideoPlayer.nativeElement.src = URL.createObjectURL(this.mediaSource);
     this.mediaSource.addEventListener('sourceopen', () => {
       console.log(this.mediaSource.readyState);
-      // const sourceBuffer = this.mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
       const sourceBuffer = this.mediaSource.addSourceBuffer('video/webm; codecs=vp9');
       sourceBuffer.addEventListener('updateend', () => {
         console.log(this.mediaSource.readyState);
-        // this.mediaSource.endOfStream();
         this.remoteVideoPlayer.nativeElement.play();
       });
       this.remoteBuffer = sourceBuffer;
@@ -107,7 +94,7 @@ export class VideoRoomComponent implements OnInit {
 
     const options = {
       audioBitsPerSecond: 64000,
-      videoBitsPerSecond: 64000,
+      videoBitsPerSecond: 100000,
       mimeType: 'video/webm; codecs=vp9'
     };
 
@@ -115,7 +102,6 @@ export class VideoRoomComponent implements OnInit {
     this.recorder = new MediaRecorder(this.localStream, options);
 
     this.recorder.ondataavailable = (event) => {
-      // console.log('data available: evt.data.type=' + event.data.type + ' size=' + event.data.size);
       reader.readAsArrayBuffer(event.data); // byte[]
       this.sendChunk(event.data);
     }
@@ -143,7 +129,6 @@ export class VideoRoomComponent implements OnInit {
       this.mediaSource.endOfStream();
       this.remoteVideoPlayer.play();
     });
-    // sourceBuffer.appendBuffer(this.remoteChunks);
   }
 
 }

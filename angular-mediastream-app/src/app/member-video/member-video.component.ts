@@ -56,20 +56,13 @@ export class MemberVideoComponent implements OnInit {
 
     this.memberVideoPlayer.nativeElement.addEventListener('error', e => {
       console.log('DOM error', this.memberVideoPlayer.nativeElement.error);
-      // this.memberVideoPlayer.nativeElement.load();
-      // this.start();
     });
 
-    this.memberVideoPlayer.nativeElement.addEventListener('progress', e => {
-      // console.log('Video Start Time:', this.memberVideoPlayer.nativeElement.videoStartTime);
-      // console.log('Buffered end:', this.memberVideoPlayer.nativeElement.buffered.end(0));
-      console.log('Delta end:', this.memberVideoPlayer.nativeElement.buffered.end(0) - this.memberVideoPlayer.nativeElement.currentTime);
-      if (this.memberVideoPlayer.nativeElement.currentTime - this.memberVideoPlayer.nativeElement.buffered.end(0) > 1.0) {
-        // this.chunkQueue.flush();
-        // this.memberVideoPlayer.nativeElement.videoStartTime = this.memberVideoPlayer.nativeElement.buffered.end(0);
-        // this.memberVideoPlayer.nativeElement.currentTime = this.memberVideoPlayer.nativeElement.buffered.end(0);
-      }
-    });
+    // this.memberVideoPlayer.nativeElement.addEventListener('progress', e => {
+    //   console.log('Delta end:', this.memberVideoPlayer.nativeElement.buffered.end(0) - this.memberVideoPlayer.nativeElement.currentTime);
+    //   if (this.memberVideoPlayer.nativeElement.currentTime - this.memberVideoPlayer.nativeElement.buffered.end(0) > 1.0) {
+    //   }
+    // });
 
     this.start();
 
@@ -82,14 +75,9 @@ export class MemberVideoComponent implements OnInit {
     this.chunkQueue = new Queue<ArrayBuffer>();
     this.started = false;
     this.headPopped = false;
-    // this.memberVideoPlayer.nativeElement.currentTime = 7 * 24 * 60 * 1000;
 
     this.channel = this.service.connect(this.room, this.name);
     this.channel
-    // .catch(error => {
-    //   console.log('subscription error:', error);
-    //   this.channel = this.service.connect(this.room, this.name);
-    // })
       .subscribe(chunk => {
         console.log('subscribe, video tag current time is :', this.memberVideoPlayer.nativeElement.currentTime);
 
@@ -113,7 +101,6 @@ export class MemberVideoComponent implements OnInit {
             this.activeBuffer.appendBuffer(this.chunkQueue.pop());
             this.headPopped = true;
           }
-          // this.memberVideoPlayer.nativeElement.currentTime = this.memberVideoPlayer.nativeElement.buffered().start(1);
         }
       });
 
@@ -127,7 +114,6 @@ export class MemberVideoComponent implements OnInit {
     internetBuffer.addEventListener('updateend', () => {
       console.log(this.name, 'SourceBuffer updateend, mediaSource status: ', this.mediaSource.readyState);
       console.log('SourceBuffer updateend, mediaSource url: ', this.memberVideoPlayer.nativeElement.src);
-      // this.sourceBuffer.appendBuffer(this.segmentChunk);
 
       // キューを使い切ったら、一度先頭を処理していないことにする
       if (this.chunkQueue.isEmpty()) {
@@ -149,8 +135,6 @@ class WebMParser {
 
   tagEBML = new Uint8Array([0x1a, 0x45, 0xdf, 0xa3]);
   tagSegment = new Uint8Array([0x18, 0x53, 0x80, 0x67]);
-  tagCluster = new Uint8Array([0x1f, 0x43, 0xb6, 0x75]);
-  tagVoid = new Uint8Array([0xec]);
 
 // 配列(ArrayBufferView)が合致しているかどうかを比較
   private equal(a, b) {
@@ -205,22 +189,5 @@ class WebMParser {
     }
 
     return true;
-    // this.ptr += this.tagSegment.byteLength;
-    // r = this.getElementSize(webm, this.ptr);
-    // this.ptr += r.offset;
-    //
-    // // Cluster手前までを検索
-    // while (!this.equal(this.tagCluster, webm.subarray(this.ptr, this.ptr + this.tagCluster.byteLength))) {
-    //   if (this.equal(this.tagVoid, webm.subarray(this.ptr, this.ptr + this.tagVoid.byteLength))) {
-    //     this.ptr += this.tagVoid.byteLength;
-    //   }      else {
-    //     this.ptr += this.tagCluster.byteLength;
-    //   }
-    //   r = this.getElementSize(webm, this.ptr);
-    //   this.ptr += r.offset + r.length;
-    // }
-    // // 初期化セグメント = WebMファイルの先頭から最初のClusterの直前まで
-    // const initSeg = new Uint8Array(webm.subarray(0, this.ptr));
-    // sb.appendBuffer(initSeg.buffer);
   }
 }
