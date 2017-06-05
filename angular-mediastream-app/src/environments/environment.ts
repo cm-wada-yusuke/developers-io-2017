@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,
-  mediaServerHost: '172.17.0.134'
+  mediaServerHost: 'localhost'
 };
