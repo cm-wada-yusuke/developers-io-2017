@@ -1,10 +1,33 @@
-<h2>Lobby</h2>
-<div>
+<div class="container">
+  <h2>Lobby</h2>
   <div>まずはこちらにアクセスしていただき、HTTPSでの接続を許可してください。</div>
   <div><a href="{{serverAddress}}">{{serverAddress}}</a></div>
-  <input type="radio" [(ngModel)]="roomType" name="roomType" value="video">Video
-  <input type="radio" [(ngModel)]="roomType" name="roomType" value="chat">Chat
-  <label>Room number: </label><input #roomNumber />
-  <label>Your name: </label><input #name />
-  <button (click)="join(roomNumber.value, name.value);">Join</button>
+  <div class="form-control">
+    <div class="form-check">
+      <input id="gameRoomType" type="radio" [(ngModel)]="roomType" name="roomType" value="game">
+      <label for="gameRoomType">Game</label>
+    </div>
+    <div class="form-check">
+      <input id="videoRoomType" type="radio" [(ngModel)]="roomType" name="roomType" value="video">
+      <label for="videoRoomType">Video</label>
+    </div>
+    <div class="form-check">
+      <input id="chatRoomType" type="radio" [(ngModel)]="roomType" name="roomType" value="chat">
+      <label for="chatRoomType">Chat</label>
+    </div>
+
+    <div class="form-group">
+      <label for="roomNumber">Room number</label>
+      <input id="roomNumber" class="form-control" placeholder="1" #roomNumber>
+    </div>
+
+    <div class="form-group">
+      <label for="name" >Your name</label>
+      <input id="name" class="form-control" placeholder="Ema" #name/>
+    </div>
+
+    <div class="form-group">
+    <button type="submit" class="btn btn-danger" (click)="join(roomNumber.value, name.value);">Join</button>
+      </div>
+  </div>
 </div>

@@ -17,6 +17,7 @@ import {ArrayBufferWebSocketService} from './arraybuffer-websocket.service';
 import {VideoService} from './video-room/video.service';
 import { MembersVideoRoomComponent } from './members-video-room/members-video-room.component';
 import { MemberVideoComponent } from './member-video/member-video.component';
+import { GameRoomComponent } from './game-room/game-room.component';
 
 ///<reference path="./Bar.ts"/>
 
@@ -28,7 +29,8 @@ import { MemberVideoComponent } from './member-video/member-video.component';
     AppNgAutoScrollDirective,
     VideoRoomComponent,
     MembersVideoRoomComponent,
-    MemberVideoComponent
+    MemberVideoComponent,
+    GameRoomComponent
   ],
   imports: [
     BrowserModule,

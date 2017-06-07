@@ -4,6 +4,7 @@ import {ChatComponent} from '../chat/chat.component';
 import {LobbyComponent} from '../lobby/lobby.component';
 import {VideoRoomComponent} from '../video-room/video-room.component';
 import {MembersVideoRoomComponent} from '../members-video-room/members-video-room.component';
+import {GameRoomComponent} from '../game-room/game-room.component';
 
 
 const routes: Routes = [
@@ -11,7 +12,8 @@ const routes: Routes = [
   {path: 'lobby', component: LobbyComponent},
   {path: 'chat/:roomNumber', component: ChatComponent},
   {path: 'localVideo/:roomNumber', component: VideoRoomComponent},
-  {path: 'video/:roomNumber', component: MembersVideoRoomComponent}
+  {path: 'video/:roomNumber', component: MembersVideoRoomComponent},
+  {path: 'game/:roomNumber', component: GameRoomComponent}
 ];
 
 @NgModule({
