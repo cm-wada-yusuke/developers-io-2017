@@ -3,15 +3,19 @@
 # ~~~~
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
+GET        /assets/*file                  controllers.Assets.versioned(path="/public", file: Asset)
 
 
 # chatroom
-GET        /chat/stream/:roomId                   controllers.chat.ChatController.start(roomId)
+GET        /chat/stream/:roomId           controllers.chat.ChatController.start(roomId)
 
 # videoroom
-GET        /video/stream/:roomId        controllers.video.VideoController.start(roomId)
+GET        /video/stream/:roomId          controllers.video.VideoController.start(roomId)
 
 
 # members
-GET        /members/stream/:roomId                controllers.member.MembersController.members(roomId)
+GET        /members/stream/:roomId        controllers.member.MembersController.members(roomId)
+
+
+# game
+GET        /game/stream/:roomId           controllers.game.GameController.start(roomId)

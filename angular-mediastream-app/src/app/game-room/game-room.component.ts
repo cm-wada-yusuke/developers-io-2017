@@ -11,7 +11,8 @@ export class GameRoomComponent implements OnInit {
 
   @ViewChild('content') content: any;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
     const greeter = new Greeter(this.content.nativeElement);

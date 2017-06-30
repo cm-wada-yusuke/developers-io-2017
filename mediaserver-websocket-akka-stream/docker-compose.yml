@@ -1,0 +1,4 @@
+redis:
+  image: redis:alpine
+  ports:
+    - "localhost:6379:6379"

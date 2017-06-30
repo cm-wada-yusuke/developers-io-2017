@@ -1,7 +1,13 @@
-import com.google.inject.AbstractModule
+import javax.inject.Named
+
+import com.google.inject.{ AbstractModule, Provides, Singleton }
+import com.redis.RedisClientPool
 import domains.chat.ChatRoomRepository
+import domains.game.GameRoomRepository
 import domains.member.MemberRepository
 import domains.video.VideoRoomRepository
+import infrastructure.game.GameStatusCacheStore
+import play.api.Configuration
 
 /**
  * This class is a Guice module that tells Guice how to bind several
@@ -19,6 +25,21 @@ class Module extends AbstractModule {
     bind(classOf[ChatRoomRepository]).to(classOf[infrastructure.chat.ChatRoomClient])
     bind(classOf[VideoRoomRepository]).to(classOf[infrastructure.video.VideoRoomClient])
     bind(classOf[MemberRepository]).to(classOf[infrastructure.member.MemberClient])
+    bind(classOf[GameRoomRepository]).to(classOf[infrastructure.game.GameRoomClient])
+    bind(classOf[GameStatusCacheStore]).to(classOf[infrastructure.game.GameStatusDAO])
   }
+
+  @Provides
+  @Singleton
+  @Named("game_status")
+  def provideContentsRedisClientPool(configuration: Configuration): RedisClientPool =
+    generateRedisClientPool(configuration, 0)
+
+  private def generateRedisClientPool(configuration: Configuration, databaseNumber: Int): RedisClientPool =
+    new RedisClientPool(
+      configuration.getString("redis.host").get,
+      configuration.getInt("redis.port").get,
+      database = databaseNumber
+    )
 
 }
