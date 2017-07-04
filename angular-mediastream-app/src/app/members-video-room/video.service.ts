@@ -7,7 +7,7 @@ import {environment} from '../../environments/environment';
 export class VideoService {
 
   private url(roomNumber: string, name: string): string {
-    return `wss://${environment.mediaServerHost}:9443/video/stream/${roomNumber}?user_name=${name}`;
+    return `ws://${environment.mediaServerHost}:9000/video/stream/${roomNumber}?user_name=${name}`;
   }
 
   constructor(private ws: ArrayBufferWebSocketService) {

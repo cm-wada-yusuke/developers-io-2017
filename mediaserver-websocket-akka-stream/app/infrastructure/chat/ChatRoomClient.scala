@@ -43,16 +43,13 @@ class ChatRoomClient @Inject()(
     // Connect "drain outlet".
     source.runWith(Sink.ignore)
 
-    val channel = ChatChannel(sink, source)
-
-    val bus: Flow[ChatMessage, ChatMessage, UniqueKillSwitch] = Flow.fromSinkAndSource(channel.sink, channel.source)
+    val bus: Flow[ChatMessage, ChatMessage, UniqueKillSwitch] = Flow.fromSinkAndSource(sink, source)
         .joinMat(KillSwitches.singleBidi[ChatMessage, ChatMessage])(Keep.right)
         .backpressureTimeout(3.seconds)
         .map { e =>
-//          println(s"$e $channel")
+//          println(s"$e $")
           e
         }
-
 
     ChatRoom(roomId, bus)
   }

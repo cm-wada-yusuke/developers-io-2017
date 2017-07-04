@@ -10,7 +10,7 @@ import {environment} from '../../environments/environment';
 export class LobbyComponent implements OnInit {
 
   roomType: string;
-  serverAddress = `https://${environment.mediaServerHost}:9443/`
+  serverAddress = `https://${environment.mediaServerHost}:9000/`
 
   constructor(
     private router: Router
