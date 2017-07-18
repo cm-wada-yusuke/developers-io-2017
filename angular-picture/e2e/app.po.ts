@@ -1,6 +1,6 @@
 import { browser, by, element } from 'protractor';
 
-export class AngularGstreamAppPage {
+export class AngularPicturePage {
   navigateTo() {
     return browser.get('/');
   }
