@@ -5,6 +5,7 @@ import {AppComponent} from './app.component';
 import {LineChartComponent} from './line-chart/line-chart.component';
 import {ChartRoutingModule} from './chart/chart-routing.module';
 import {RouterModule, Routes} from '@angular/router';
+import { TttComponent } from './ttt/ttt.component';
 
 
 const routes: Routes = [
@@ -14,7 +15,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    LineChartComponent
+    LineChartComponent,
+    TttComponent
   ],
   imports: [
     BrowserModule,
