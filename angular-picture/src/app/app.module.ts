@@ -6,24 +6,31 @@ import {LineChartComponent} from './line-chart/line-chart.component';
 import {ChartRoutingModule} from './chart/chart-routing.module';
 import {RouterModule, Routes} from '@angular/router';
 import { TttComponent } from './ttt/ttt.component';
+import {WebSocketService} from './websocket.service';
+import { LobbyComponent } from './lobby/lobby.component';
+import {FormsModule} from '@angular/forms';
 
 
 const routes: Routes = [
-  { path: '', redirectTo: '/lineChart', pathMatch: 'full' }
+  { path: '', redirectTo: '/lobby', pathMatch: 'full' }
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
     LineChartComponent,
-    TttComponent
+    TttComponent,
+    LobbyComponent
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     RouterModule.forRoot(routes),
     ChartRoutingModule
   ],
-  providers: [],
+  providers: [
+    WebSocketService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

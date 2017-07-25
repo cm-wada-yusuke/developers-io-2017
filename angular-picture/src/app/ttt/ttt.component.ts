@@ -1,4 +1,5 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {ActivatedRoute, Params} from '@angular/router';
 
 import * as d3 from 'd3-selection';
 import * as d3Scale from 'd3-scale';
@@ -7,14 +8,28 @@ import * as d3Shape from 'd3-shape';
 import * as d3Array from 'd3-array';
 import * as d3Axis from 'd3-axis';
 import {ScaleOrdinal} from 'd3-scale';
+import {selection} from 'd3-selection';
+import {TTTStatus} from './ttt.status';
+import {Observable} from 'rxjs/Observable';
+import {GameStatusService} from './game-status.service';
+import {GameCommandService} from './game-command.service';
+import {GameCommand} from './game-command';
+import {Subject} from 'rxjs/Subject';
 
 
 @Component({
   selector: 'app-ttt',
   templateUrl: './ttt.component.html',
-  styleUrls: ['./ttt.component.css']
+  providers: [GameStatusService, GameCommandService],
+  styleUrls: ['./ttt.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class TttComponent implements OnInit {
+
+  game: TTTStatus;
+  roomNumber: string;
+  name: string;
+  colorMap: {};
 
   private margin = {top: 100, right: 100, bottom: 100, left: 100};
   private width = 384;
@@ -22,22 +37,53 @@ export class TttComponent implements OnInit {
   private svg: any;
   private x: any;
   private y: any;
-  private numrows = 15;
-  private numcols = 10;
+  private numrows = 3;
+  private numcols = 3;
   private matrix = new Array(this.numrows);
 
-  constructor() {
+  constructor(
+    private route: ActivatedRoute,
+    private statusService: GameStatusService,
+    private commandService: GameCommandService
+  ) {
   }
 
   ngOnInit() {
+    this.initGame();
     this.initSvg();
     this.initAxis();
     this.draw();
   }
 
+  private initGame() {
+    this.route.params.forEach((params: Params) => {
+      this.roomNumber = params['roomNumber'];
+    });
+
+    this.route.queryParams.forEach((params: Params) => {
+      this.name = params['name'];
+    });
+
+    this.colorMap = {1: this.randomRGBLeft(), 2: this.randomRGBRight(), 0: 'white'};
+
+    this.game = new TTTStatus(0, 0, {}, {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0});
+
+    this.statusService.connect(this.roomNumber, this.name).subscribe(msg => {
+      this.game = msg;
+      this.paintBoard(this.game.board);
+    });
+
+    this.commandService.connect(this.roomNumber, this.name).subscribe(msg => {
+      // do nothing.
+      console.log(msg);
+    });
+
+  }
+
   private initSvg() {
     this.svg = d3.select('svg')
       .append('g')
+      .attr('class', 'matrix')
       .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
     this.svg.append('rect')
@@ -55,6 +101,7 @@ export class TttComponent implements OnInit {
 
   private initAxis() {
     this.x = d3Scale.scaleBand()
+    // .domain(d3Array.range(this.numcols).map((v) => v.toString()))
       .domain(d3Array.range(this.numcols).map((v) => v.toString()))
       .range([0, this.width]);
 
@@ -65,21 +112,12 @@ export class TttComponent implements OnInit {
   }
 
   private draw() {
-    // const colorMap = d3Scale.scaleLinear()
-    //   .domain([-1, 0, 1])
-    //   .range([parseInt('0xFF0000', 16), parseInt('0x000000', 16), parseInt('0x0000FF', 16)]);
-
-    const colorMap = d3Scale.scaleLinear<string>()
-      .domain([-1, 0, 1])
-      .range(['red', 'white', 'blue']);
-
 
     const row = this.svg.selectAll('.row')
       .data(this.matrix)
       .enter().append('g')
       .attr('class', 'row')
       .attr('transform', function (d, i) {
-        console.log(this.y);
         return 'translate(0,' + (this.y)(i) + ')';
       }.bind(this));
 
@@ -94,12 +132,12 @@ export class TttComponent implements OnInit {
       }.bind(this))
       .attr('width', this.x.bandwidth())
       .attr('height', this.y.bandwidth())
-      .style('stroke-width', 0);
+      .attr('stroke', '#2378ae')
+      .style('stroke-width', 1);
 
     row.append('line')
       .attr('x2', this.width);
 
-    console.log(this.y.bandwidth());
     row.append('text')
       .attr('x', 0)
       .attr('y', this.y.bandwidth() / 2)
@@ -132,8 +170,99 @@ export class TttComponent implements OnInit {
       .data(function (d, i) {
         return this.matrix[i];
       }.bind(this))
-      .style('fill', colorMap);
+      .style('fill', 'white');
+
+    this.svg.selectAll('.cell')
+      .on('click', (d, i) => {
+        this.commandService.send(this.roomNumber, this.name, i + 1);
+      });
+
 
   }
 
+  private selection(n) {
+    return (d, i) => i === n;
+  }
+
+  private paintBoard(board: {}): void {
+    // d3 オブジェクト取得
+    const row = this.svg.selectAll('.row');
+
+    // 順番に見ていって塗りつぶしていく
+    Object.keys(board).forEach((v, i, a) => {
+      const player = board[v];
+      const color = this.colorMap[player];
+      const p = new Point(Number(v));
+      row.filter(this.selection(p.x))
+        .selectAll('.cell')
+        .filter(this.selection(p.y))
+        .style('fill', color);
+    });
+  }
+
+  private randomRGBLeft(): string {
+    return d3Scale.interpolateWarm(Math.random() * 0.25);
+  }
+
+  private randomRGBRight(): string {
+    return d3Scale.interpolateWarm(Math.random() * (1 - 0.75) + 0.75);
+  }
+
+  positionName(status: TTTStatus, yourName: string): string {
+    const n = status.players[yourName];
+    if (n) {
+      return `あなたはプレイヤー${n}です。`;
+    } else {
+      return 'あなたは観戦者です';
+    }
+  }
+
+  statusName(status: TTTStatus): string {
+    switch (status.state) {
+      case 0:
+        return '未決着です';
+      case 1:
+      case 2:
+        return `プレイヤー${status.state}の勝利です`;
+      case 3:
+        return '引き分けです';
+    }
+  }
+
+  turnName(status: TTTStatus, yourName: string): string {
+    if (status.turn === 0) {
+      return '相手の参加待ちです';
+    }
+    const n = status.players[yourName];
+    console.log(status.players[yourName], n);
+    console.log(status.players, yourName);
+    if (n && n === status.turn) {
+      return 'あなたの手番です';
+    } else if (n) {
+      return '相手の手番です';
+    } else {
+      return `プレイヤー ${status.turn} の手番です。`;
+    }
+  }
+
+}
+
+export class Point {
+
+  private _x: number;
+  private _y: number;
+
+  constructor(private boardNumber: number) {
+    this._x = Math.floor((boardNumber - 1) / 3);
+    this._y = (boardNumber - 1) % 3;
+  }
+
+
+  get x(): number {
+    return this._x;
+  }
+
+  get y(): number {
+    return this._y;
+  }
 }
