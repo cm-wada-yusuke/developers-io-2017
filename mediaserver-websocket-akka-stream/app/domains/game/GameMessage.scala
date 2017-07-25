@@ -15,20 +15,21 @@ object Frame extends GameMessage
 
 case class GameStatus(turn: Int, state: Int, players: Map[String, Int], board: Board) extends GameMessage {
 
-  def join(name: String, players: Map[String, Int]): Map[String, Int] = {
-    if (players.isEmpty) {
-      players + (name -> 1)
+  def join(name: String, players: Map[String, Int]): GameStatus = {
+    val (newPlayers, newTurn) = if (players.isEmpty) {
+      (players + (name -> 1), 0)
     } else if (players.size == 1) {
-      players + (name -> 2)
+      (players + (name -> 2), 1)
     } else {
-      players
+      (players, turn)
     }
+    GameStatus(newTurn, state, newPlayers, board)
   }
 
   def command(name: String, command: Int): GameStatus = {
     // name から1P2P判定
     val commander = this.players(name)
-    if (turn == commander || turn == 0) {
+    if (turn == commander) {
       judge(command, commander, this)
     } else {
       this

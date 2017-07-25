@@ -12,15 +12,13 @@ import {selection} from 'd3-selection';
 import {TTTStatus} from './ttt.status';
 import {Observable} from 'rxjs/Observable';
 import {GameStatusService} from './game-status.service';
-import {GameCommandService} from './game-command.service';
-import {GameCommand} from './game-command';
 import {Subject} from 'rxjs/Subject';
 
 
 @Component({
   selector: 'app-ttt',
   templateUrl: './ttt.component.html',
-  providers: [GameStatusService, GameCommandService],
+  providers: [GameStatusService],
   styleUrls: ['./ttt.component.css'],
   encapsulation: ViewEncapsulation.None
 })
@@ -43,8 +41,7 @@ export class TttComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private statusService: GameStatusService,
-    private commandService: GameCommandService
+    private statusService: GameStatusService
   ) {
   }
 
@@ -69,15 +66,21 @@ export class TttComponent implements OnInit {
     this.game = new TTTStatus(0, 0, {}, {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0});
 
     this.statusService.connect(this.roomNumber, this.name).subscribe(msg => {
+      console.log('ゲームメッセージ：', msg);
       this.game = msg;
       this.paintBoard(this.game.board);
     });
 
-    this.commandService.connect(this.roomNumber, this.name).subscribe(msg => {
-      // do nothing.
-      console.log(msg);
-    });
+    // this.commandService.connect(this.roomNumber, this.name).subscribe(msg => {
+    //   console.log('コマンド：', msg);
+    //   // do nothing.
+    // });
 
+  }
+
+  reset(): void {
+    console.log('clicked reset button');
+    this.statusService.reset(this.roomNumber);
   }
 
   private initSvg() {
@@ -174,7 +177,7 @@ export class TttComponent implements OnInit {
 
     this.svg.selectAll('.cell')
       .on('click', (d, i) => {
-        this.commandService.send(this.roomNumber, this.name, i + 1);
+        this.statusService.command(this.roomNumber, this.name, i + 1);
       });
 
 
@@ -234,8 +237,6 @@ export class TttComponent implements OnInit {
       return '相手の参加待ちです';
     }
     const n = status.players[yourName];
-    console.log(status.players[yourName], n);
-    console.log(status.players, yourName);
     if (n && n === status.turn) {
       return 'あなたの手番です';
     } else if (n) {

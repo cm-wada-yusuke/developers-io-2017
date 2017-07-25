@@ -12,12 +12,12 @@ class GameStatusDAO @Inject()(
     @Named("game_status") override val pool: RedisClientPool
 )extends RedisJsonAdapter[GameStatus] with GameStatusCacheStore {
 
-  private val ttl: Int = 60 // s
+  private val ttl: Int = 60 // おい！
 
   override implicit def format: Format[GameStatus] = GameStatusConverters.GameStatusFormat
 
   override def insertOrUpdate(status: GameStatus, key: String): Unit =
-    upsertByKey(key, ttl, status)
+    upsertByKey(key, status)
 
   override def find(key: String): Option[GameStatus] = findByKey(key)
 }

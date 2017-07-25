@@ -2,7 +2,7 @@ package infrastructure.game
 
 import javax.inject.Inject
 
-import domains.game.{ Command, GameStatus, Join }
+import domains.game.{ Board, Command, GameStatus, Join }
 
 class GameLogic @Inject()(
     cacheStore: GameStatusCacheStore
@@ -13,7 +13,7 @@ class GameLogic @Inject()(
       case None => ()
       case Some(s) =>
         val updated = s.join(join.userName, s.players)
-        cacheStore.insertOrUpdate(GameStatus(s.turn, s.state, updated, s.board), join.roomId)
+        cacheStore.insertOrUpdate(updated, join.roomId)
     }
   }
 
@@ -23,5 +23,9 @@ class GameLogic @Inject()(
       case Some(s) => cacheStore.insertOrUpdate(s.command(command.userName, command.command), command.roomId)
     }
   }
+
+  def load(roomId: String): GameStatus = cacheStore.find(roomId).get
+
+  def reset(roomId: String): Unit = cacheStore.insertOrUpdate(GameStatus(0, 0, Map[String, Int](), Board()), roomId)
 
 }

@@ -4,13 +4,12 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import akka.stream.{ KillSwitches, Materializer, ThrottleMode, UniqueKillSwitch }
+import akka.stream._
 import akka.stream.scaladsl.{ BroadcastHub, Flow, Keep, MergeHub, Sink, Source }
 import domains.game._
 
 import scala.collection.mutable
 import scala.concurrent.duration._
-
 
 class GameRoomClient @Inject()(
     implicit val materializer: Materializer,
@@ -21,7 +20,7 @@ class GameRoomClient @Inject()(
 
   import GameRoomClient._
 
-  override def chatRoom(roomId: String, userName: String): GameRoom = synchronized {
+  override def gamrRoom(roomId: String, userName: String): GameRoom = synchronized {
     roomPool.get.get(roomId) match {
       case Some(chatRoom) =>
         chatRoom
@@ -40,29 +39,26 @@ class GameRoomClient @Inject()(
     }
 
     // Create bus parts.
+    // bufferSize を大きくすることで、消費されなくてもバッファされる。いっぱいになるとバックプレッシャーがかかる。
     val (sink, source) =
-      MergeHub.source[GameMessage](perProducerBufferSize = 16)
-          .toMat(BroadcastHub.sink(bufferSize = 256))(Keep.both)
-          .run()
+    MergeHub.source[GameMessage](perProducerBufferSize = 16)
+        .toMat(BroadcastHub.sink(bufferSize = 1024))(Keep.both)
+        .run()
 
-    // Connect "drain outlet".
-    source.runWith(Sink.ignore)
-
-    // Game status publisher.
-    sink.runWith(Source.repeat(Frame).throttle(1, 1.second, 5, ThrottleMode.Shaping))
 
     val channel = GameChannel(sink, source)
 
     val bus: Flow[GameMessage, GameMessage, UniqueKillSwitch] = Flow.fromSinkAndSource(channel.sink, channel.source)
         .joinMat(KillSwitches.singleBidi[GameMessage, GameMessage])(Keep.right)
-        .backpressureTimeout(3.seconds)
+        //        .backpressureTimeout(3.seconds)
         .map[GameMessage] {
       case j: Join =>
         gameLogic.join(j)
+        println(j)
         cacheStore.find(roomId).get
       case c: Command =>
-        println("GameRoomClient: " + c)
         gameLogic.command(c)
+        println(c)
         cacheStore.find(roomId).get
       case Frame =>
         val f = cacheStore.find(roomId).get
@@ -71,8 +67,23 @@ class GameRoomClient @Inject()(
       case m =>
         println(m)
         m
-
     }
+
+    bus.runWith(
+      Source.repeat(Frame).throttle(1, 1.second, 100, ThrottleMode.Shaping),
+      //Sink.foreach(println) // Connect "drain outlet".
+      Sink.ignore
+    )
+
+    //
+    //    val actorSource = bus.runWith(
+    //      Source.actorRef[GameMessage](bufferSize = 1024, OverflowStrategy.dropBuffer),
+    //      Sink.foreach(println) // Connect "drain outlet".
+    //    )._1
+    //
+    //    system.scheduler.schedule(3.seconds, 1 second){
+    //      actorSource ! Frame
+    //    }
 
     GameRoom(roomId, bus)
   }

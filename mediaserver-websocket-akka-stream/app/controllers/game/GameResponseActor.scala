@@ -13,13 +13,11 @@ class GameResponseActor(out: ActorRef, me: String) extends Actor {
       out ! Json.toJson(s)
     case Leave(roomId, userName) =>
       if (userName == me) {
+        println(s"$userName will Poison Pill...")
         out ! PoisonPill
         self ! PoisonPill
       }
   }
-
-  override def postStop(): Unit = super.postStop()
-
 }
 
 object GameResponseActor {
