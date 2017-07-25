@@ -1,0 +1,27 @@
+<div class="container">
+  <h2>Lobby</h2>
+  <div class="form-control">
+    <div class="form-check">
+      <input id="gameRoomType" type="radio" [(ngModel)]="roomType" name="roomType" value="ttt">
+      <label for="gameRoomType">Game</label>
+    </div>
+    <div class="form-check">
+      <input id="videoRoomType" type="radio" [(ngModel)]="roomType" name="roomType" value="line-chart">
+      <label for="videoRoomType">Chart</label>
+    </div>
+
+    <div class="form-group">
+      <label for="roomNumber">Room number</label>
+      <input id="roomNumber" class="form-control" placeholder="1" #roomNumber>
+    </div>
+
+    <div class="form-group">
+      <label for="name" >Your name</label>
+      <input id="name" class="form-control" placeholder="Ema" #name/>
+    </div>
+
+    <div class="form-group">
+    <button type="submit" class="btn btn-danger" (click)="join(roomNumber.value, name.value);">Join</button>
+      </div>
+  </div>
+</div>
