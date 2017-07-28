@@ -39,51 +39,28 @@ class GameRoomClient @Inject()(
     }
 
     // Create bus parts.
-    // bufferSize を大きくすることで、消費されなくてもバッファされる。いっぱいになるとバックプレッシャーがかかる。
     val (sink, source) =
     MergeHub.source[GameMessage](perProducerBufferSize = 16)
         .toMat(BroadcastHub.sink(bufferSize = 1024))(Keep.both)
         .run()
 
-
     val channel = GameChannel(sink, source)
 
     val bus: Flow[GameMessage, GameMessage, UniqueKillSwitch] = Flow.fromSinkAndSource(channel.sink, channel.source)
         .joinMat(KillSwitches.singleBidi[GameMessage, GameMessage])(Keep.right)
-        //        .backpressureTimeout(3.seconds)
+        .backpressureTimeout(3.seconds)
         .map[GameMessage] {
       case j: Join =>
         gameLogic.join(j)
-        println(j)
-        cacheStore.find(roomId).get
-      case c: Command =>
-        gameLogic.command(c)
-        println(c)
         cacheStore.find(roomId).get
       case Frame =>
-        val f = cacheStore.find(roomId).get
-        println(f)
-        f
-      case m =>
-        println(m)
-        m
+        cacheStore.find(roomId).get
     }
 
     bus.runWith(
       Source.repeat(Frame).throttle(1, 1.second, 100, ThrottleMode.Shaping),
-      //Sink.foreach(println) // Connect "drain outlet".
       Sink.ignore
     )
-
-    //
-    //    val actorSource = bus.runWith(
-    //      Source.actorRef[GameMessage](bufferSize = 1024, OverflowStrategy.dropBuffer),
-    //      Sink.foreach(println) // Connect "drain outlet".
-    //    )._1
-    //
-    //    system.scheduler.schedule(3.seconds, 1 second){
-    //      actorSource ! Frame
-    //    }
 
     GameRoom(roomId, bus)
   }
