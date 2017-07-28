@@ -44,6 +44,9 @@ class GameRoomClient @Inject()(
         .toMat(BroadcastHub.sink(bufferSize = 1024))(Keep.both)
         .run()
 
+    source.runWith(Sink.ignore)
+    sink.runWith(Source.repeat(Frame).throttle(1, 1.second, 5, ThrottleMode.Shaping))
+
     val channel = GameChannel(sink, source)
 
     val bus: Flow[GameMessage, GameMessage, UniqueKillSwitch] = Flow.fromSinkAndSource(channel.sink, channel.source)
@@ -56,11 +59,6 @@ class GameRoomClient @Inject()(
       case Frame =>
         cacheStore.find(roomId).get
     }
-
-    bus.runWith(
-      Source.repeat(Frame).throttle(1, 1.second, 100, ThrottleMode.Shaping),
-      Sink.ignore
-    )
 
     GameRoom(roomId, bus)
   }

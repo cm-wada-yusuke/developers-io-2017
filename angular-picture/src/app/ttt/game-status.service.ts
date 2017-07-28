@@ -11,11 +11,11 @@ export class GameStatusService {
   private messages: Subject<TTTStatus>;
 
   private url(roomNumber: string, name: string): string {
-    return `ws://172.17.0.132:9000/game/stream/${roomNumber}?user_name=${name}`;
+    return `ws://localhost:9000/game/stream/${roomNumber}?user_name=${name}`;
   }
 
   private commandUrl(roomNumber: string): string {
-    return `http://172.17.0.132:9000/game/command/${roomNumber}`;
+    return `http://localhost:9000/game/command/${roomNumber}`;
   }
 
   constructor(
